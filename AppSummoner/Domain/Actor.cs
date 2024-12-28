@@ -5,20 +5,37 @@ namespace AppSummoner.Domain;
 
 public static class Actor
 {
-    public static void Execute(AppInfo appInfo, Behaviour behaviour)
+    public static void Execute(Hotkey hotkey)
     {
-        if (behaviour.Minimize || behaviour.Hide || behaviour.Focus)
+        var appInfo = new AppInfo
+        {
+            FriendlyName = null,
+            ProcessName = null,
+            FilePath = null
+        }; // Todo: Get from hotkey
+        
+        var behaviour = new Behaviour(); // Todo: Get from hotkey
+        
+        Execute(appInfo, behaviour);
+    }
+    
+    private static void Execute(AppInfo appInfo, Behaviour behaviour)
+    {
+        if (behaviour.Dismiss || behaviour.Focus)
         {
             if (WindowHandler.IsProcessInForeground(appInfo.ProcessName))
             {
-                if (behaviour.Minimize)
+                if (behaviour.Dismiss)
                 {
-                    WindowHandler.MinimizeForegroundWindow();
-                    return;
-                }
-                if (behaviour.Hide)
-                {
-                    WindowHandler.HideForegroundWindow();
+                    if (behaviour.DismissType == DismissType.MINIMIZE)
+                    {
+                        WindowHandler.MinimizeForegroundWindow();
+                    }
+                    else
+                    {
+                        WindowHandler.HideForegroundWindow();
+                    }
+
                     return;
                 }
             }

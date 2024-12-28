@@ -12,4 +12,8 @@
       <Folder Include="Presentation\Windows\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Bio" Version="2.1.7" />
+    </ItemGroup>
+
 </Project>

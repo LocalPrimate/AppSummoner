@@ -30,36 +30,5 @@
         >
             test
         </TextBlock>
-        
-        <Button 
-            Click="InvokeRuneButton_Click" 
-            Width="64"
-            Height="32"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Bottom"
-            Margin="64">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="5" />
-                </Style>
-            </Button.Resources>
-            <Label FontSize="12">Start</Label>
-        </Button>
-        
-        <Button 
-            Click="InvokeRuneButton_Click" 
-            Width="64"
-            Height="32"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Bottom"
-            Margin="64">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="5" />
-                </Style>
-            </Button.Resources>
-            <Label FontSize="12">Start</Label>
-        </Button>
-        
     </Grid>
 </Window>

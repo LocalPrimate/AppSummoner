@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using System.Windows;
 using AppSummoner.Domain.Handlers;
+using Bio;
+using Bio.Win32;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 
@@ -13,10 +15,13 @@ public partial class MainWindow : Window
 {
     // FOR TESTING
     private FileInfo? _tempFileInfo = null;
-    
+
     public MainWindow() 
     {
         InitializeComponent();
+        
+        // Just initializing it
+        Console.WriteLine(HotkeyInputHandler.Instance.ToString());
     }
 
     private void AddRuneButton_Click(object sender, RoutedEventArgs e)
@@ -35,12 +40,6 @@ public partial class MainWindow : Window
                                           Path: {_tempFileInfo.FullName}
                                           """;
         }
-    }
-
-    private void InvokeRuneButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (_tempFileInfo is null) return;
-        InputHandler.OnTestingButtonPressed(_tempFileInfo);
     }
 }
 
