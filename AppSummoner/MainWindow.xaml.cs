@@ -21,7 +21,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         
         // Just initializing it
-        Console.WriteLine(HotkeyInputHandler.Instance.ToString());
+        // Console.WriteLine(HotkeyInputHandler.Instance.ToString());
     }
 
     private void AddRuneButton_Click(object sender, RoutedEventArgs e)

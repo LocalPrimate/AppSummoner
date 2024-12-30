@@ -4,7 +4,6 @@ namespace AppSummoner.Data.Models;
 
 public class Hotkey
 {
-    public Guid Id { get; init; }
     public string? Name { get; init; }
     public VK Keycode { get; init; }
     public ModifierKeyFlags? Modifiers { get; init; }
