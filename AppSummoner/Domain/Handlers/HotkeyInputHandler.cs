@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using AppSummoner.Data;
 using AppSummoner.Data.Models;
+using AppSummoner.Domain.Interfaces;
 using Bio;
 using Bio.Win32;
 
@@ -8,25 +9,31 @@ namespace AppSummoner.Domain.Handlers;
 
 // Todo: Inject this whole class on application startup, instead of instantiating it in a WPF window.
 
-public sealed class HotkeyInputHandler
+public class HotkeyInputHandler : IHotkeyInputHandler
 {
-    private static readonly Lazy<HotkeyInputHandler> _lazy 
-        = new(() => new HotkeyInputHandler());
-
-    public static HotkeyInputHandler Instance => _lazy.Value;
-    
-    private readonly Dictionary<string, Hotkey> _hotkeys;
+    private readonly IConfigManager _configManager;
+    private readonly Dictionary<string, HotkeyConfig> _hotkeys;
     private readonly KeyboardHook _keyboardHook;
     private readonly ModifierKeyFlags _modifiersTracker;
     private readonly HashSet<VK> _keyTracker;
 
-    public HotkeyInputHandler()
+    public HotkeyInputHandler(IConfigManager configManager)
     {
-        _modifiersTracker = new ModifierKeyFlags();
-        _hotkeys = new Dictionary<string, Hotkey>();
-        _keyTracker = [];
-        
+        _configManager = configManager;
         _keyboardHook = InitializeKeyboardHook();
+        _modifiersTracker = new ModifierKeyFlags();
+        _hotkeys = new Dictionary<string, HotkeyConfig>();
+        _keyTracker = [];
+    }
+
+    public void Init()
+    {
+        // Todo: Move to func so it can be re-executed when a new hotkey is configured
+        var hotkeyConfigs = _configManager.GetHotkeys();
+        hotkeyConfigs.ForEach(hotkeyConfig =>
+        {
+            _hotkeys.TryAdd(hotkeyConfig.Hotkey.GetKey(), hotkeyConfig);
+        });
     }
 
     
@@ -54,6 +61,8 @@ public sealed class HotkeyInputHandler
         {
             var keyInfo = msg.KBDLLHOOKSTRUCT;
             var keyIsBeingHeldDown = !_keyTracker.Add(keyInfo.vkCode);
+            
+            Console.WriteLine(keyInfo.vkCode);
             
             if (keyIsBeingHeldDown) return;
 
@@ -90,9 +99,9 @@ public sealed class HotkeyInputHandler
                 Modifiers = _modifiersTracker
             };
 
-            if (_hotkeys.TryGetValue(eventHotkey.GetKey(), out Hotkey? targetHotkey))
+            if (_hotkeys.TryGetValue(eventHotkey.GetKey(), out HotkeyConfig? targetHotkeyConfig))
             {
-                Actor.Execute(targetHotkey);
+                Actor.Execute(targetHotkeyConfig);
             }
         }
         catch (Exception e)
