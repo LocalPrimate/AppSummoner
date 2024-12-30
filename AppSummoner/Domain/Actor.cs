@@ -1,22 +1,14 @@
-﻿using AppSummoner.Data.Models;
+﻿using AppSummoner.Data;
+using AppSummoner.Data.Models;
 using AppSummoner.Domain.Handlers;
 
 namespace AppSummoner.Domain;
 
 public static class Actor
 {
-    public static void Execute(Hotkey hotkey)
+    public static void Execute(HotkeyConfig hotkeyConfig)
     {
-        var appInfo = new AppInfo
-        {
-            FriendlyName = null,
-            ProcessName = null,
-            FilePath = null
-        }; // Todo: Get from hotkey
-        
-        var behaviour = new Behaviour(); // Todo: Get from hotkey
-        
-        Execute(appInfo, behaviour);
+        Execute(hotkeyConfig.AppInfo, hotkeyConfig.Behaviour);
     }
     
     private static void Execute(AppInfo appInfo, Behaviour behaviour)
