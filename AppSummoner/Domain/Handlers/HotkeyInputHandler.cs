@@ -62,8 +62,6 @@ public class HotkeyInputHandler : IHotkeyInputHandler
             var keyInfo = msg.KBDLLHOOKSTRUCT;
             var keyIsBeingHeldDown = !_keyTracker.Add(keyInfo.vkCode);
             
-            Console.WriteLine(keyInfo.vkCode);
-            
             if (keyIsBeingHeldDown) return;
 
             switch (keyInfo.vkCode)
