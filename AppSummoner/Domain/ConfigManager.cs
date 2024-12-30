@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using AppSummoner.Data;
 using AppSummoner.Data.Models;
@@ -11,19 +10,18 @@ namespace AppSummoner.Domain;
 // Todo: Decide if all config files should be in the executable's location instead.
 // Todo: Handle exceptions with crash logs
 
-public sealed class ConfigManager : IConfigManager
+public class ConfigManager : IConfigManager
 {
     private const string APP_DATA_FOLDER_NAME = "AppSummoner";
     private const string HOTKEY_CONFIG_FILE_NAME = "hotkeys.json";
     private const string SETTINGS_FILE_NAME = "settings.json";
     
-    private readonly string _appDataDirectory;
     private readonly string _hotkeyConfigFile;
     private readonly string _settingsFile;
 
     public ConfigManager()
     {
-        (_appDataDirectory, _hotkeyConfigFile, _settingsFile) = ValidateAndCreateDirectories();
+        (_hotkeyConfigFile, _settingsFile) = ValidateAndCreateDirectories();
     }
     
     public List<HotkeyConfig> GetHotkeys()
@@ -60,7 +58,7 @@ public sealed class ConfigManager : IConfigManager
         }
     }
 
-    private (string appDir, string hotkeyConfigFile, string settingsFile) ValidateAndCreateDirectories()
+    private (string hotkeyConfigFile, string settingsFile) ValidateAndCreateDirectories()
     {
         try
         {
@@ -88,7 +86,7 @@ public sealed class ConfigManager : IConfigManager
                 fs.Write(info, 0, info.Length);
             }
 
-            return (thisAppDataDir, hotkeyConfigPath, userSettingsPath);
+            return (hotkeyConfigPath, userSettingsPath);
         }
         catch (Exception e)
         {
