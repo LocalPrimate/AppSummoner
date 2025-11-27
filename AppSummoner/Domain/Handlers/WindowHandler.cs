@@ -27,6 +27,10 @@ public static class WindowHandler
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     static extern bool IsWindowVisible(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsIconic(IntPtr hWnd);
     
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr GetWindow(IntPtr hWnd, GetWindowType uCmd);
@@ -144,8 +148,11 @@ public static class WindowHandler
 
     private static void ForceForegroundWindow(IntPtr hWnd)
     {
-        // Restore window if minimized
-        ShowWindow(hWnd, SW_RESTORE);
+        // Only restore if window is minimized (iconic)
+        if (IsIconic(hWnd))
+        {
+            ShowWindow(hWnd, SW_RESTORE);
+        }
 
         // Simulate Alt key press to allow SetForegroundWindow to succeed
         // This is a documented workaround for SetForegroundWindow restrictions
