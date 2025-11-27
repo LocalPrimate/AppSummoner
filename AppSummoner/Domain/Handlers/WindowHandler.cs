@@ -143,7 +143,15 @@ public static class WindowHandler
     {
         try
         {
-            Process.Start(new ProcessStartInfo { FileName = filePath });
+            // Use cmd.exe with START command to break parent-child process relationship
+            // This ensures the launched app continues running even after AppSummoner exits
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/C start \"\" \"{filePath}\"",
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
             // TODO: Add delay before this method can be called again for the same filepath
         }
         catch (Exception ex)
