@@ -10,12 +10,17 @@ public static class WinProcess
     private static extern IntPtr GetForegroundWindow();
 
     [DllImport("user32.dll", SetLastError = true)]
-    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId); 
+    private static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
     [DllImport("user32.dll")]
     private static extern bool EnumThreadWindows(int dwThreadId, EnumThreadDelegate lpfn, IntPtr lParam);
 
     private delegate bool EnumThreadDelegate(IntPtr hWnd, IntPtr lParam);
+
+    public static IntPtr GetForegroundWindowHandle()
+    {
+        return GetForegroundWindow();
+    }
 
     public static Process? GetForegroundWindowProcess()
     {
