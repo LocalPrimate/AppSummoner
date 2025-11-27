@@ -31,7 +31,10 @@ public static class WindowHandler
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool IsIconic(IntPtr hWnd);
-    
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetShellWindow();
+
     [DllImport("user32.dll", SetLastError = true)]
     private static extern IntPtr GetWindow(IntPtr hWnd, GetWindowType uCmd);
 
@@ -84,7 +87,19 @@ public static class WindowHandler
 
         if (foregroundWindowHandle == IntPtr.Zero) return;
 
+        // Find the next window in Z-order that should receive focus (before minimizing)
+        IntPtr nextFocusWindow = FindNextFocusableWindow(foregroundWindowHandle);
+
         ShowWindow(foregroundWindowHandle, SW_SHOWMINIMIZED);
+
+        // Small delay to let Windows process the minimize
+        System.Threading.Thread.Sleep(50);
+
+        // Switch focus to the previously identified window
+        if (nextFocusWindow != IntPtr.Zero)
+        {
+            ForceFocusWindow(nextFocusWindow);
+        }
     }
 
     public static void HideForegroundWindow()
@@ -93,7 +108,19 @@ public static class WindowHandler
 
         if (foregroundWindowHandle == IntPtr.Zero) return;
 
+        // Find the next window in Z-order that should receive focus (before hiding)
+        IntPtr nextFocusWindow = FindNextFocusableWindow(foregroundWindowHandle);
+
         ShowWindow(foregroundWindowHandle, SW_HIDE);
+
+        // Small delay to let Windows process the hide
+        System.Threading.Thread.Sleep(50);
+
+        // Switch focus to the previously identified window
+        if (nextFocusWindow != IntPtr.Zero)
+        {
+            ForceFocusWindow(nextFocusWindow);
+        }
     }
 
     public static void FocusWindow(string processName)
@@ -164,6 +191,37 @@ public static class WindowHandler
         SetForegroundWindow(hWnd);
 
         // Release Alt key
+        keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
+    }
+
+    private static IntPtr FindNextFocusableWindow(IntPtr currentWindow)
+    {
+        // Get the next window in Z-order (the window right behind the current one)
+        IntPtr nextWindow = GetWindow(currentWindow, GetWindowType.GW_HWNDNEXT);
+
+        while (nextWindow != IntPtr.Zero)
+        {
+            // Find the first visible, non-minimized window
+            if (IsWindowVisible(nextWindow) && !IsIconic(nextWindow))
+            {
+                return nextWindow;
+            }
+
+            nextWindow = GetWindow(nextWindow, GetWindowType.GW_HWNDNEXT);
+        }
+
+        // Fallback: Return the shell/desktop window
+        return GetShellWindow();
+    }
+
+    private static void ForceFocusWindow(IntPtr hWnd)
+    {
+        // Use Alt key trick to allow SetForegroundWindow to succeed
+        keybd_event(VK_MENU, 0, 0, UIntPtr.Zero);
+
+        BringWindowToTop(hWnd);
+        SetForegroundWindow(hWnd);
+
         keybd_event(VK_MENU, 0, KEYEVENTF_KEYUP, UIntPtr.Zero);
     }
     
