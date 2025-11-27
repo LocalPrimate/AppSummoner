@@ -5,30 +5,78 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AppSummoner"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="App Summoner" Height="450" Width="800">
 
-    <Grid Background="LightBlue">
-        <Button 
-            Click="AddRuneButton_Click" 
-            Width="25"
-            Height="25"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Top"
-            Margin="64">
-            <Button.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="CornerRadius" Value="50" />
-                </Style>
-            </Button.Resources>
-            <Label FontSize="12">+</Label>
-        </Button>
-        
-        <TextBlock
-            x:Name="TextBlock_RuneAppName"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-        >
-            test
-        </TextBlock>
-    </Grid>
+    <TabControl>
+        <!-- Runes Tab -->
+        <TabItem Header="Runes">
+            <Grid Background="LightBlue">
+                <Button
+                    Click="AddRuneButton_Click"
+                    Width="25"
+                    Height="25"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="64">
+                    <Button.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="50" />
+                        </Style>
+                    </Button.Resources>
+                    <Label FontSize="12">+</Label>
+                </Button>
+
+                <TextBlock
+                    x:Name="TextBlock_RuneAppName"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                >
+                    test
+                </TextBlock>
+            </Grid>
+        </TabItem>
+
+        <!-- Focus Stealing Prevention Tab -->
+        <TabItem Header="Focus Stealing Prevention">
+            <Grid Background="White" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0" FontSize="14" FontWeight="Bold" Margin="0,0,0,10">
+                    Blocked Executables
+                </TextBlock>
+
+                <ListBox x:Name="BlockedExecutablesListBox" Grid.Row="1" Margin="0,0,0,10">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock FontWeight="Bold" Text="{Binding ProcessName}"/>
+                                    <TextBlock FontSize="10" Foreground="Gray" Text="{Binding FilePath}"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1" Content="Remove"
+                                        Click="RemoveBlockedExecutable_Click"
+                                        Tag="{Binding ProcessName}"
+                                        Padding="10,5"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <Button Grid.Row="2" Content="Add Blocked Executable"
+                        Click="AddBlockedExecutable_Click"
+                        HorizontalAlignment="Left"
+                        Padding="15,10"/>
+            </Grid>
+        </TabItem>
+    </TabControl>
 </Window>

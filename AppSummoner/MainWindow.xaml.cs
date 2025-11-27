@@ -1,6 +1,9 @@
 ﻿using System.IO;
 using System.Windows;
+using System.Windows.Controls;
+using AppSummoner.Data.Models;
 using AppSummoner.Domain.Handlers;
+using AppSummoner.Domain.Interfaces;
 using Bio;
 using Bio.Win32;
 using Microsoft.Win32;
@@ -16,10 +19,16 @@ public partial class MainWindow : Window
     // FOR TESTING
     private FileInfo? _tempFileInfo = null;
 
-    public MainWindow() 
+    private readonly IFocusStealingSuppressor _focusStealingSuppressor;
+
+    public MainWindow(IFocusStealingSuppressor focusStealingSuppressor)
     {
         InitializeComponent();
-        
+        _focusStealingSuppressor = focusStealingSuppressor;
+
+        // Load and display blocked executables
+        LoadBlockedExecutables();
+
         // Just initializing it
         // Console.WriteLine(HotkeyInputHandler.Instance.ToString());
     }
@@ -40,6 +49,60 @@ public partial class MainWindow : Window
                                           Path: {_tempFileInfo.FullName}
                                           """;
         }
+    }
+
+    private void AddBlockedExecutable_Click(object sender, RoutedEventArgs e)
+    {
+        var openFileDialog = new OpenFileDialog
+        {
+            Filter = "Executables (*.exe)|*.exe",
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+            Title = "Select Executable to Block from Focus Stealing"
+        };
+
+        if (openFileDialog.ShowDialog() == true)
+        {
+            var fileInfo = new FileInfo(openFileDialog.FileName);
+            var processName = Path.GetFileNameWithoutExtension(fileInfo.Name);
+
+            var blockedExecutable = new BlockedExecutable
+            {
+                ProcessName = processName,
+                FilePath = fileInfo.FullName
+            };
+
+            _focusStealingSuppressor.AddBlockedExecutable(blockedExecutable);
+            LoadBlockedExecutables();
+
+            MessageBox.Show($"Added {processName} to blocked list.\n\nFocus stealing from this application will now be suppressed.",
+                "Blocked Executable Added",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information);
+        }
+    }
+
+    private void RemoveBlockedExecutable_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is string processName)
+        {
+            var result = MessageBox.Show(
+                $"Remove {processName} from blocked list?",
+                "Confirm Removal",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                _focusStealingSuppressor.RemoveBlockedExecutable(processName);
+                LoadBlockedExecutables();
+            }
+        }
+    }
+
+    private void LoadBlockedExecutables()
+    {
+        var blockedExecutables = _focusStealingSuppressor.GetBlockedExecutables();
+        BlockedExecutablesListBox.ItemsSource = blockedExecutables;
     }
 }
 

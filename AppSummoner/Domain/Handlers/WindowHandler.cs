@@ -222,7 +222,7 @@ public static class WindowHandler
         return GetShellWindow();
     }
 
-    private static void ForceFocusWindow(IntPtr hWnd)
+    public static void ForceFocusWindow(IntPtr hWnd)
     {
         // Use Alt key trick to allow SetForegroundWindow to succeed
         keybd_event(VK_MENU, 0, 0, UIntPtr.Zero);

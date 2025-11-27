@@ -7,4 +7,6 @@ public interface IConfigManager
 {
     public List<HotkeyConfig> GetHotkeys();
     public UserSettings GetUserSettings();
+    public UserSettings LoadUserSettings();
+    public void SaveUserSettings(UserSettings settings);
 }

@@ -2,5 +2,5 @@
 
 public class UserSettings
 {
-    
+    public List<BlockedExecutable> BlockedExecutables { get; set; } = new();
 }
