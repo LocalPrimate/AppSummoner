@@ -47,13 +47,53 @@ public class ConfigManager : IConfigManager
         {
             using var reader = new StreamReader(_settingsFile);
             var json = reader.ReadToEnd();
-            
-            return JsonConvert.DeserializeObject<UserSettings>(json) 
+
+            return JsonConvert.DeserializeObject<UserSettings>(json)
                    ?? throw new Exception("user settings failed to deserialize");
         }
         catch (Exception e)
         {
             Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public UserSettings LoadUserSettings()
+    {
+        try
+        {
+            if (!File.Exists(_settingsFile))
+            {
+                return new UserSettings();
+            }
+
+            using var reader = new StreamReader(_settingsFile);
+            var json = reader.ReadToEnd();
+
+            if (string.IsNullOrWhiteSpace(json) || json == "{}")
+            {
+                return new UserSettings();
+            }
+
+            return JsonConvert.DeserializeObject<UserSettings>(json) ?? new UserSettings();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while loading user settings: {e}");
+            return new UserSettings();
+        }
+    }
+
+    public void SaveUserSettings(UserSettings settings)
+    {
+        try
+        {
+            var json = JsonConvert.SerializeObject(settings, Formatting.Indented);
+            File.WriteAllText(_settingsFile, json);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while saving user settings: {e}");
             throw;
         }
     }

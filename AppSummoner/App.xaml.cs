@@ -2,6 +2,7 @@
 using AppSummoner.Domain;
 using AppSummoner.Domain.Handlers;
 using AppSummoner.Domain.Interfaces;
+using AppSummoner.Domain.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppSummoner;
@@ -12,11 +13,11 @@ namespace AppSummoner;
 public partial class App : Application
 {
     private readonly ServiceProvider _serviceProvider;
-    
+
     public App()
     {
         var services = new ServiceCollection();
-        
+
         ConfigureServices(services);
         _serviceProvider = services.BuildServiceProvider();
     }
@@ -25,6 +26,7 @@ public partial class App : Application
     {
         services.AddSingleton<IConfigManager, ConfigManager>();
         services.AddSingleton<IHotkeyInputHandler, HotkeyInputHandler>();
+        services.AddSingleton<IFocusStealingSuppressor, FocusStealingSuppressor>();
         services.AddSingleton<MainWindow>();
     }
 
@@ -34,8 +36,9 @@ public partial class App : Application
         {
             // Todo: Handle these nulls
 
-            _serviceProvider.GetService<IHotkeyInputHandler>().Init();
-            _serviceProvider.GetService<MainWindow>().Show();
+            _serviceProvider.GetService<IHotkeyInputHandler>()?.Init();
+            _serviceProvider.GetService<IFocusStealingSuppressor>()?.Start();
+            _serviceProvider.GetService<MainWindow>()?.Show();
         }
         catch (Exception exception)
         {
