@@ -32,6 +32,7 @@ public class FocusStealingSuppressor : IFocusStealingSuppressor
     private IntPtr _keyboardHookId = IntPtr.Zero;
     private LowLevelMouseProc? _mouseProc;
     private LowLevelKeyboardProc? _keyboardProc;
+    private WinEventDelegate? _winEventProc;
 
     private delegate IntPtr LowLevelMouseProc(int nCode, IntPtr wParam, IntPtr lParam);
     private delegate IntPtr LowLevelKeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
@@ -175,11 +176,13 @@ public class FocusStealingSuppressor : IFocusStealingSuppressor
         _keyboardHookId = SetHookKeyboard(WH_KEYBOARD_LL, _keyboardProc);
 
         // Set up Windows event hook for real-time foreground window change detection
+        // IMPORTANT: Store the delegate in a field to prevent garbage collection
+        _winEventProc = WinEventProc;
         _winEventHook = SetWinEventHook(
             EVENT_SYSTEM_FOREGROUND,
             EVENT_SYSTEM_FOREGROUND,
             IntPtr.Zero,
-            WinEventProc,
+            _winEventProc,
             0,
             0,
             WINEVENT_OUTOFCONTEXT);
@@ -214,6 +217,11 @@ public class FocusStealingSuppressor : IFocusStealingSuppressor
             UnhookWinEvent(_winEventHook);
             _winEventHook = IntPtr.Zero;
         }
+
+        // Clear delegate references
+        _mouseProc = null;
+        _keyboardProc = null;
+        _winEventProc = null;
     }
 
     public void AddBlockedExecutable(BlockedExecutable executable)

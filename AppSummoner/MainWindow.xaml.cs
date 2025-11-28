@@ -14,9 +14,6 @@ namespace AppSummoner;
 /// </summary>
 public partial class MainWindow : Window
 {
-    // FOR TESTING
-    private FileInfo? _tempFileInfo = null;
-
     private readonly IFocusStealingSuppressor _focusStealingSuppressor;
     private readonly IConfigManager _configManager;
 
@@ -41,13 +38,29 @@ public partial class MainWindow : Window
         var openFileDialog = new OpenFileDialog
         {
             Filter = "Executables (*.exe)|*.exe",
-            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles)
+            InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+            Title = "Select Application for Hotkey"
         };
 
         if (openFileDialog.ShowDialog() == true)
         {
-            _tempFileInfo = new FileInfo(openFileDialog.FileName);
-            // TODO: Implement rune creation logic
+            var fileInfo = new FileInfo(openFileDialog.FileName);
+            var editWindow = new EditHotkeyWindow(fileInfo)
+            {
+                Owner = this
+            };
+
+            if (editWindow.ShowDialog() == true && editWindow.UpdatedHotkey != null)
+            {
+                _configManager.AddHotkey(editWindow.UpdatedHotkey);
+                LoadHotkeys();
+
+                MessageBox.Show(
+                    $"Hotkey for '{editWindow.UpdatedHotkey.AppInfo.FriendlyName}' has been created successfully.",
+                    "Hotkey Created",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
         }
     }
 
@@ -103,6 +116,60 @@ public partial class MainWindow : Window
     {
         var blockedExecutables = _focusStealingSuppressor.GetBlockedExecutables();
         BlockedExecutablesListBox.ItemsSource = blockedExecutables;
+    }
+
+    private void RemoveHotkey_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is HotkeyConfig hotkeyConfig)
+        {
+            var result = MessageBox.Show(
+                $"Remove hotkey '{hotkeyConfig.Hotkey.Modifiers} + {hotkeyConfig.Hotkey.Keycode}' for {hotkeyConfig.AppInfo.FriendlyName}?",
+                "Confirm Removal",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                _configManager.RemoveHotkey(hotkeyConfig);
+                LoadHotkeys();
+
+                MessageBox.Show(
+                    $"Hotkey for {hotkeyConfig.AppInfo.FriendlyName} has been removed.",
+                    "Hotkey Removed",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+    }
+
+    private void EditHotkey_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is HotkeyConfig hotkeyConfig)
+        {
+            var editWindow = new EditHotkeyWindow(hotkeyConfig)
+            {
+                Owner = this
+            };
+
+            if (editWindow.ShowDialog() == true && editWindow.UpdatedHotkey != null)
+            {
+                _configManager.UpdateHotkey(hotkeyConfig, editWindow.UpdatedHotkey);
+                LoadHotkeys();
+
+                MessageBox.Show(
+                    $"Hotkey for '{editWindow.UpdatedHotkey.AppInfo.FriendlyName}' has been updated successfully.",
+                    "Hotkey Updated",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+        }
+    }
+
+    private void LoadHotkeys()
+    {
+        Hotkeys = _configManager.GetHotkeys();
+        HotkeysItemsControl.ItemsSource = null;
+        HotkeysItemsControl.ItemsSource = Hotkeys;
     }
 }
 

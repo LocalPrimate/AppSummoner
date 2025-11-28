@@ -98,6 +98,81 @@ public class ConfigManager : IConfigManager
         }
     }
 
+    public void SaveHotkeys(List<HotkeyConfig> hotkeys)
+    {
+        try
+        {
+            var json = JsonConvert.SerializeObject(hotkeys, Formatting.Indented);
+            File.WriteAllText(_hotkeyConfigFile, json);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while saving hotkeys: {e}");
+            throw;
+        }
+    }
+
+    public void AddHotkey(HotkeyConfig hotkey)
+    {
+        try
+        {
+            var hotkeys = GetHotkeys();
+            hotkeys.Add(hotkey);
+            SaveHotkeys(hotkeys);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while adding hotkey: {e}");
+            throw;
+        }
+    }
+
+    public void RemoveHotkey(HotkeyConfig hotkey)
+    {
+        try
+        {
+            var hotkeys = GetHotkeys();
+            var hotkeyToRemove = hotkeys.FirstOrDefault(h =>
+                h.AppInfo.ProcessName == hotkey.AppInfo.ProcessName &&
+                h.Hotkey.Keycode == hotkey.Hotkey.Keycode &&
+                h.Hotkey.Modifiers == hotkey.Hotkey.Modifiers);
+
+            if (hotkeyToRemove != null)
+            {
+                hotkeys.Remove(hotkeyToRemove);
+                SaveHotkeys(hotkeys);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while removing hotkey: {e}");
+            throw;
+        }
+    }
+
+    public void UpdateHotkey(HotkeyConfig oldHotkey, HotkeyConfig newHotkey)
+    {
+        try
+        {
+            var hotkeys = GetHotkeys();
+            var index = hotkeys.FindIndex(h =>
+                h.AppInfo.ProcessName == oldHotkey.AppInfo.ProcessName &&
+                h.Hotkey.Keycode == oldHotkey.Hotkey.Keycode &&
+                h.Hotkey.Modifiers == oldHotkey.Hotkey.Modifiers);
+
+            if (index >= 0)
+            {
+                hotkeys[index] = newHotkey;
+                SaveHotkeys(hotkeys);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"Exception while updating hotkey: {e}");
+            throw;
+        }
+    }
+
     private (string hotkeyConfigFile, string settingsFile) ValidateAndCreateDirectories()
     {
         try

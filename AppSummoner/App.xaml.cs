@@ -14,6 +14,10 @@ public partial class App : Application
 {
     private readonly ServiceProvider _serviceProvider;
 
+    // Keep strong references to prevent garbage collection of delegates used in unmanaged hooks
+    private IHotkeyInputHandler? _hotkeyInputHandler;
+    private IFocusStealingSuppressor? _focusStealingSuppressor;
+
     public App()
     {
         var services = new ServiceCollection();
@@ -34,10 +38,12 @@ public partial class App : Application
     {
         try
         {
-            // Todo: Handle these nulls
+            // Store services in fields to keep strong references and prevent GC of unmanaged delegates
+            _hotkeyInputHandler = _serviceProvider.GetService<IHotkeyInputHandler>();
+            _focusStealingSuppressor = _serviceProvider.GetService<IFocusStealingSuppressor>();
 
-            _serviceProvider.GetService<IHotkeyInputHandler>()?.Init();
-            _serviceProvider.GetService<IFocusStealingSuppressor>()?.Start();
+            _hotkeyInputHandler?.Init();
+            _focusStealingSuppressor?.Start();
             _serviceProvider.GetService<MainWindow>()?.Show();
         }
         catch (Exception exception)
