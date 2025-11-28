@@ -10,29 +10,61 @@
     <TabControl>
         <!-- Runes Tab -->
         <TabItem Header="Runes">
-            <Grid Background="LightBlue">
-                <Button
-                    Click="AddRuneButton_Click"
-                    Width="25"
-                    Height="25"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Top"
-                    Margin="64">
-                    <Button.Resources>
-                        <Style TargetType="Border">
-                            <Setter Property="CornerRadius" Value="50" />
-                        </Style>
-                    </Button.Resources>
-                    <Label FontSize="12">+</Label>
-                </Button>
+            <Grid Background="White" Margin="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                <TextBlock
-                    x:Name="TextBlock_RuneAppName"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                >
-                    test
+                <TextBlock Grid.Row="0" FontSize="14" FontWeight="Bold" Margin="0,0,0,10">
+                    Configured Runes
                 </TextBlock>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Hotkeys}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="LightGray" BorderThickness="1" Margin="0,0,0,10" Padding="10" CornerRadius="5">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding AppInfo.FriendlyName}"/>
+                                            <TextBlock FontSize="11" Foreground="Gray" Margin="0,2,0,0">
+                                                <Run Text="Hotkey: "/>
+                                                <Run FontWeight="SemiBold" Text="{Binding Hotkey.Modifiers, Mode=OneWay}"/>
+                                                <Run Text=" + "/>
+                                                <Run FontWeight="SemiBold" Text="{Binding Hotkey.Keycode, Mode=OneWay}"/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="10" Foreground="DarkGray" Text="{Binding AppInfo.FilePath}" Margin="0,2,0,0"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <TextBlock FontSize="10" Foreground="Gray" Margin="5,0">
+                                                <Run Text="Launch:"/>
+                                                <Run Text="{Binding Behaviour.Launch}"/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="10" Foreground="Gray" Margin="5,0">
+                                                <Run Text="Focus:"/>
+                                                <Run Text="{Binding Behaviour.Focus}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Button Grid.Row="2"
+                    Click="AddRuneButton_Click"
+                    Content="Add New Rune"
+                    HorizontalAlignment="Left"
+                    Padding="15,10"/>
             </Grid>
         </TabItem>
 

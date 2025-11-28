@@ -1,11 +1,9 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using AppSummoner.Data;
 using AppSummoner.Data.Models;
-using AppSummoner.Domain.Handlers;
 using AppSummoner.Domain.Interfaces;
-using Bio;
-using Bio.Win32;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 
@@ -20,17 +18,22 @@ public partial class MainWindow : Window
     private FileInfo? _tempFileInfo = null;
 
     private readonly IFocusStealingSuppressor _focusStealingSuppressor;
+    private readonly IConfigManager _configManager;
 
-    public MainWindow(IFocusStealingSuppressor focusStealingSuppressor)
+    public List<HotkeyConfig> Hotkeys { get; private set; }
+
+    public MainWindow(IFocusStealingSuppressor focusStealingSuppressor, IConfigManager configManager)
     {
         InitializeComponent();
         _focusStealingSuppressor = focusStealingSuppressor;
+        _configManager = configManager;
+
+        // Load hotkeys
+        Hotkeys = _configManager.GetHotkeys();
+        DataContext = this;
 
         // Load and display blocked executables
         LoadBlockedExecutables();
-
-        // Just initializing it
-        // Console.WriteLine(HotkeyInputHandler.Instance.ToString());
     }
 
     private void AddRuneButton_Click(object sender, RoutedEventArgs e)
@@ -44,10 +47,7 @@ public partial class MainWindow : Window
         if (openFileDialog.ShowDialog() == true)
         {
             _tempFileInfo = new FileInfo(openFileDialog.FileName);
-            TextBlock_RuneAppName.Text = $"""
-                                          Name: {Path.GetFileNameWithoutExtension(_tempFileInfo.Name)}
-                                          Path: {_tempFileInfo.FullName}
-                                          """;
+            // TODO: Implement rune creation logic
         }
     }
 
