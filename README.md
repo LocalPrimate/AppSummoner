@@ -1,6 +1,6 @@
 <!--<p align="center"><img src="https://github.com/LocalPrimate/AppSummoner/raw/main/AppSummoner/Resources/AppSummonerLogo.png" /></p>-->
 
-<p align="center"><img src="https://github.com/LocalPrimate/AppSummoner/blob/main/AppSummoner/Resources/AppSummonerIcon2x.png?raw=true" /></p>
+<p align="center"><img src="https://github.com/LocalPrimate/AppSummoner/blob/main/AppSummoner/Resources/AppSummonerIcon-2-2x.png?raw=true" /></p>
 
 ---
 
